@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Moedas</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+
+        <h1 class="text-2xl font-bold text-center mb-6">
+            Conversor de Moedas
+        </h1>
+
+        <input
+            type="number"
+            id="valor"
+            placeholder="Digite um valor"
+            class="w-full border p-2 rounded mb-4"
+        >
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+
+            <select id="origem" class="border p-2 rounded">
+                <option value="BRL">BRL</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+            </select>
+
+            <select id="destino" class="border p-2 rounded">
+                <option value="USD">USD</option>
+                <option value="BRL">BRL</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+            </select>
+
+        </div>
+
+        <button
+            onclick="converter()"
+            class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+            Converter
+        </button>
+
+        <button
+            onclick="inverter()"
+            class="w-full mt-2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+        >
+            Inverter Moedas
+        </button>
+
+        <div class="mt-6">
+
+            <h2 class="font-bold">Resultado</h2>
+            <p id="resultado">-</p>
+
+        </div>
+
+        <div class="mt-4">
+
+            <h2 class="font-bold">Cotação Atual</h2>
+            <p id="cotacao">-</p>
+
+        </div>
+
+        <div class="mt-4">
+
+            <h2 class="font-bold">Última Atualização</h2>
+            <p id="atualizacao">-</p>
+
+        </div>
+
+        <div class="mt-4">
+
+            <div class="flex justify-between items-center">
+                <h2 class="font-bold">Histórico</h2>
+
+                <button
+                    onclick="limparHistorico()"
+                    class="text-red-600"
+                >
+                    Limpar
+                </button>
+            </div>
+
+            <ul id="historico" class="text-sm mt-2"></ul>
+
+        </div>
+
+    </div>
+
+    <script>
+        carregarHistorico();
+
+        async function converter() {
+
+            const valor =
+                document.getElementById("valor").value;
+
+            const origem =
+                document.getElementById("origem").value;
+
+            const destino =
+                document.getElementById("destino").value;
+
+            if (!valor || valor <= 0) {
+                alert("Digite um valor válido.");
+                return;
+            }
+
+            try {
+
+                const resposta =
+                    await fetch(
+                        `https://open.er-api.com/v6/latest/${origem}`
+                    );
+
+                const dados =
+                    await resposta.json();
+
+                const taxa =
+                    dados.rates[destino];
+
+                const resultado =
+                    valor * taxa;
+
+                document.getElementById("resultado")
+                    .innerText =
+                    `${valor} ${origem} = ${resultado.toFixed(2)} ${destino}`;
+
+                document.getElementById("cotacao")
+                    .innerText =
+                    `1 ${origem} = ${taxa.toFixed(4)} ${destino}`;
+
+                document.getElementById("atualizacao")
+                    .innerText =
+                    new Date(
+                        dados.time_last_update_utc
+                    ).toLocaleString("pt-BR");
+
+                salvarHistorico(
+                    `${valor} ${origem} → ${destino} = ${resultado.toFixed(2)}`
+                );
+
+            } catch {
+
+                document.getElementById("resultado")
+                    .innerText =
+                    "Erro ao consultar a API.";
+
+            }
+        }
+
+        function inverter() {
+
+            const origem =
+                document.getElementById("origem");
+
+            const destino =
+                document.getElementById("destino");
+
+            const temp =
+                origem.value;
+
+            origem.value =
+                destino.value;
+
+            destino.value =
+                temp;
+        }
+
+        function salvarHistorico(item) {
+
+            let historico =
+                JSON.parse(
+                    localStorage.getItem("historico")
+                ) || [];
+
+            historico.unshift(item);
+
+            if (historico.length > 5) {
+                historico.pop();
+            }
+
+            localStorage.setItem(
+                "historico",
+                JSON.stringify(historico)
+            );
+
+            carregarHistorico();
+        }
+
+        function carregarHistorico() {
+
+            const historico =
+                JSON.parse(
+                    localStorage.getItem("historico")
+                ) || [];
+
+            const lista =
+                document.getElementById("historico");
+
+            lista.innerHTML = "";
+
+            historico.forEach(item => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent = item;
+
+                lista.appendChild(li);
+            });
+        }
+
+        function limparHistorico() {
+
+            localStorage.removeItem("historico");
+
+            carregarHistorico();
+        }
+    </script>
+
+</body>
+</html>
+
