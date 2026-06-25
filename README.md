@@ -11,15 +11,13 @@ Aplicação web desenvolvida em HTML, JavaScript e Tailwind CSS que consome uma 
 - Consulta de cotação atual
 - Inversão de moedas
 - Histórico de conversões
-- Armazenamento local usando Local Storage
 - Exibição da última atualização da cotação
-- Tratamento de erros
 - Interface responsiva
 
 ## Tecnologias Utilizadas
 
 - HTML5
-- JavaScript (ES6)
+- JavaScript
 - Tailwind CSS
 - Fetch API
 
@@ -41,9 +39,6 @@ Foi utilizada para realizar requisições assíncronas à API de câmbio.
 
 Escolhido por permitir uma estilização rápida, moderna e responsiva sem necessidade de arquivos CSS adicionais.
 
-### Local Storage
-
-Utilizado para armazenar o histórico de conversões no navegador do usuário.
 
 ## Limitações
 
@@ -51,12 +46,6 @@ Utilizado para armazenar o histórico de conversões no navegador do usuário.
 - Necessidade de conexão com a internet.
 - Quantidade limitada de moedas cadastradas na interface.
 
-## Melhorias Futuras
-
-- Adicionar mais moedas.
-- Criar gráficos de variação cambial.
-- Permitir atualização automática das cotações.
-- Exportar histórico em PDF ou CSV.
 
 ## Como Executar
 
